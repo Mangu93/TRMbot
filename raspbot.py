@@ -8,9 +8,9 @@ import datetime
 import token
 import os
 import commands
-
-TOKEN = 'vuestroToken' #Nuestro token del bot
- 
+import sched
+TOKEN = 'Enter your token' #Nuestro token del bot
+s = sched.scheduler(time.time, time.sleep)
 bot = telebot.TeleBot(TOKEN) # Creamos el objeto de nuestro bot.
 #############################################
 #Listener
@@ -26,7 +26,7 @@ bot.set_update_listener(listener) # Así, le decimos al bot que utilice como fun
 @bot.message_handler(commands=['help']) 
 def command_ayuda(m): 
     cid = m.chat.id 
-    bot.send_message( cid, "Comandos Disponibles: /help, /temp, /saludo")
+    bot.send_message( cid, "Comandos Disponibles: /help, /date, /temp, /saludo, /espacio")
 
 @bot.message_handler(commands=['temp'])
 def command_temp(m):
@@ -35,13 +35,33 @@ def command_temp(m):
 	temp = commands.getoutput('sudo /opt/vc/bin/vcgencmd measure_temp')	
 	bot.send_message(cid, temp)
 
+@bot.message_handler(commands=['date'])
+def command_temp(m):
+        cid = m.chat.id
+	saludo = commands.getoutput('date')
+        bot.send_message(cid, saludo)
 @bot.message_handler(commands=['saludo'])
 def command_temp(m):
         cid = m.chat.id
-	saludo = commands.getoutput('./saludo.sh')
+	saludo = commands.getoutput('bash /home/pi/saludo.sh')
         bot.send_message(cid, saludo)
 
+@bot.message_handler(commands=['espacio'])
+def command_espacio(m):
+        cid = m.chat.id
+        info = commands.getoutput('df -h')
+        bot.send_message(cid, info)
+""" 
+def timer(sc,m):
+	cid = m.chat.id
+	info = commands.getoutput('sudo ping www.google.es')
+	if "unreachable" not in info:
+		bot.send(cid,info)
+	else:
+		msg = 'There is some trouble with the network'
+		bot.send(cid,info)
+	
+""" 
 #############################################
 #Peticiones
 bot.polling(none_stop=True) # Con esto, le decimos al bot que siga funcionando incluso si encuentra algun fallo.
-
